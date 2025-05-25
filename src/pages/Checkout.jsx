@@ -101,7 +101,7 @@ function Checkout() {
         clearCart();
 
         if (formData.paymentMethod === 'cash-on-delivery'){
-          navigate(`/orders/${response.data.orderId}`);
+          navigate(`/orders/${response.data.order_id}`);
         } else {
           navigate(`/payment/${response.data.order_id}`, {
           state: {
