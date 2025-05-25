@@ -437,9 +437,7 @@ function Checkout() {
                     <p className="item-price">${item.price.toFixed(2)}</p>
                   </div>
                   
-                  <div className="item-total">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </div>
+                  
                 </div>
               ))}
             </div>
