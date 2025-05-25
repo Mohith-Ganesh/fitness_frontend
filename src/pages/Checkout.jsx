@@ -100,12 +100,18 @@ function Checkout() {
         setOrderId(response.data.order_id);
         clearCart();
 
-        navigate(`/payment/${response.data.order_id}`, {
+        if (formData.paymentMethod === 'cash-on-delivery'){
+          navigate(`/orders/${orderId}`);
+        } else {
+          navigate(`/payment/${response.data.order_id}`, {
           state: {
             amount: response.data.total_amount,
             paymentMethod: formData.paymentMethod,
-          }
-        });
+           }
+         });
+        }
+
+        
 
       } else {
         throw new Error('Failed to create order');
