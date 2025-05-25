@@ -17,7 +17,7 @@ function PaymentPage () {
   const handlePayment = async () => {
     setIsProcessing(true);
     try {
-      if (paymentMethod === 'COD') {
+      if (paymentMethod === 'cash-on-delivery') {
         navigate(`/orders/${orderId}`);
       } else {
         setTimeout(async () => {
