@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { mockProducts, mockOrders } from '../../services/mockData';
-import { FaBox, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUtensils, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown, FaExclamationTriangle, FaClock } from 'react-icons/fa';
 
 function AdminDashboard() {
   const [stats, setStats] = useState({
-    totalProducts: 0,
+    totalMenuItems: 0,
     totalOrders: 0,
     totalRevenue: 0,
-    totalUsers: 0,
-    lowStockProducts: []
+    totalStudents: 0,
+    lowStockItems: []
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,13 +30,13 @@ function AdminDashboard() {
         const orders = ordersResponse.data;
         
         // Calculate statistics
-        const totalProducts = products.length;
+        const totalMenuItems = products.length;
         const totalOrders = orders.length;
         const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
-        const totalUsers = 42; // Mock value
+        const totalStudents = 156; // Mock value
         
-        // Find products with low stock (less than 10 items)
-        const lowStockProducts = products.filter(product => product.stock_quantity < 10);
+        // Find items with low stock (less than 10 items)
+        const lowStockItems = products.filter(product => product.stock_quantity < 10);
         
         // Get recent orders (last 5)
         const recent = [...orders].sort((a, b) => 
@@ -44,11 +44,11 @@ function AdminDashboard() {
         ).slice(0, 5);
         
         setStats({
-          totalProducts,
+          totalMenuItems,
           totalOrders,
           totalRevenue,
-          totalUsers,
-          lowStockProducts
+          totalStudents,
+          lowStockItems
         });
         
         setRecentOrders(recent);
@@ -57,18 +57,18 @@ function AdminDashboard() {
         console.error('Error fetching dashboard data:', err);
         
         // Fallback to mock data
-        const totalProducts = mockProducts.length;
+        const totalMenuItems = mockProducts.length;
         const totalOrders = mockOrders.length;
         const totalRevenue = mockOrders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
-        const totalUsers = 42;
-        const lowStockProducts = mockProducts.filter(product => product.stock_quantity < 10);
+        const totalStudents = 156;
+        const lowStockItems = mockProducts.filter(product => product.stock_quantity < 10);
         
         setStats({
-          totalProducts,
+          totalMenuItems,
           totalOrders,
           totalRevenue,
-          totalUsers,
-          lowStockProducts
+          totalStudents,
+          lowStockItems
         });
         
         setRecentOrders(mockOrders.slice(0, 5));
@@ -79,6 +79,36 @@ function AdminDashboard() {
 
     fetchDashboardData();
   }, []);
+
+  // Check if ordering is currently available
+  const isOrderingAvailable = () => {
+    const now = new Date();
+    const cutoffTime = new Date();
+    cutoffTime.setHours(11, 30, 0, 0); // 11:30 AM
+    return now < cutoffTime;
+  };
+
+  const getTimeUntilCutoff = () => {
+    const now = new Date();
+    const cutoff = new Date();
+    cutoff.setHours(11, 30, 0, 0);
+    
+    if (now > cutoff) {
+      // Past cutoff, show next day
+      cutoff.setDate(cutoff.getDate() + 1);
+      cutoff.setHours(8, 0, 0, 0); // 8:00 AM next day
+      return `Ordering opens tomorrow at 8:00 AM`;
+    }
+    
+    const diff = cutoff - now;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m until ordering closes`;
+    }
+    return `${minutes}m until ordering closes`;
+  };
 
   if (loading) {
     return (
@@ -94,17 +124,39 @@ function AdminDashboard() {
       {error && (
         <div className="alert alert-info">{error}</div>
       )}
+
+      {/* Ordering Status Banner */}
+      <div className={`ordering-banner ${isOrderingAvailable() ? 'available' : 'closed'}`} style={{
+        padding: '1rem',
+        marginBottom: '2rem',
+        borderRadius: '8px',
+        textAlign: 'center',
+        backgroundColor: isOrderingAvailable() ? '#d4edda' : '#f8d7da',
+        border: `1px solid ${isOrderingAvailable() ? '#c3e6cb' : '#f5c6cb'}`,
+        color: isOrderingAvailable() ? '#155724' : '#721c24'
+      }}>
+        <FaClock style={{marginRight: '8px'}} />
+        {isOrderingAvailable() ? (
+          <span>
+            <strong>Ordering Open!</strong> {getTimeUntilCutoff()}
+          </span>
+        ) : (
+          <span>
+            <strong>Ordering Closed</strong> - {getTimeUntilCutoff()}
+          </span>
+        )}
+      </div>
       
       <div className="dashboard-stats">
         <div className="stat-card">
           <div className="stat-icon products">
-            <FaBox />
+            <FaUtensils />
           </div>
           <div className="stat-content">
-            <h3 className="stat-title">Total Products</h3>
-            <div className="stat-value">{stats.totalProducts}</div>
+            <h3 className="stat-title">Menu Items</h3>
+            <div className="stat-value">{stats.totalMenuItems}</div>
             <div className="stat-change positive">
-              <FaArrowUp /> 5% from last month
+              <FaArrowUp /> 3 new items this week
             </div>
           </div>
         </div>
@@ -114,10 +166,10 @@ function AdminDashboard() {
             <FaShoppingCart />
           </div>
           <div className="stat-content">
-            <h3 className="stat-title">Total Orders</h3>
+            <h3 className="stat-title">Today's Orders</h3>
             <div className="stat-value">{stats.totalOrders}</div>
             <div className="stat-change positive">
-              <FaArrowUp /> 12% from last month
+              <FaArrowUp /> 15% from yesterday
             </div>
           </div>
         </div>
@@ -127,10 +179,10 @@ function AdminDashboard() {
             <FaDollarSign />
           </div>
           <div className="stat-content">
-            <h3 className="stat-title">Total Revenue</h3>
+            <h3 className="stat-title">Today's Revenue</h3>
             <div className="stat-value">${stats.totalRevenue.toFixed(2)}</div>
             <div className="stat-change positive">
-              <FaArrowUp /> 8% from last month
+              <FaArrowUp /> 12% from yesterday
             </div>
           </div>
         </div>
@@ -140,10 +192,10 @@ function AdminDashboard() {
             <FaUsers />
           </div>
           <div className="stat-content">
-            <h3 className="stat-title">Total Users</h3>
-            <div className="stat-value">{stats.totalUsers}</div>
-            <div className="stat-change negative">
-              <FaArrowDown /> 2% from last month
+            <h3 className="stat-title">Active Students</h3>
+            <div className="stat-value">{stats.totalStudents}</div>
+            <div className="stat-change positive">
+              <FaArrowUp /> 8 new registrations
             </div>
           </div>
         </div>
@@ -161,8 +213,8 @@ function AdminDashboard() {
               <thead>
                 <tr>
                   <th>Order ID</th>
-                  <th>Date</th>
-                  <th>Customer</th>
+                  <th>Time</th>
+                  <th>Student</th>
                   <th>Status</th>
                   <th>Total</th>
                   <th>Action</th>
@@ -172,11 +224,13 @@ function AdminDashboard() {
                 {recentOrders.map(order => (
                   <tr key={order.order_id}>
                     <td>#{order.order_id}</td>
-                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td>Customer {order.user_id}</td>
+                    <td>{new Date(order.createdAt).toLocaleTimeString()}</td>
+                    <td>Student {order.user_id}</td>
                     <td>
                       <span className={`status-badge ${order.status.toLowerCase()}`}>
-                        {order.status}
+                        {order.status === 'placed' ? 'Preparing' : 
+                         order.status === 'shipped' ? 'Ready' : 
+                         order.status}
                       </span>
                     </td>
                     <td>${parseFloat(order.total_amount).toFixed(2)}</td>
@@ -195,21 +249,21 @@ function AdminDashboard() {
         <div className="dashboard-section">
           <div className="section-header">
             <h2 className="section-title">
-              <FaExclamationTriangle className="warning-icon" /> Low Stock Products
+              <FaExclamationTriangle className="warning-icon" /> Low Stock Items
             </h2>
-            <Link to="/admin/products" className="view-all">View All Products</Link>
+            <Link to="/admin/products" className="view-all">Manage Menu</Link>
           </div>
           
-          {stats.lowStockProducts.length === 0 ? (
+          {stats.lowStockItems.length === 0 ? (
             <div className="empty-state">
-              <p>No products are currently low in stock.</p>
+              <p>All menu items are well stocked.</p>
             </div>
           ) : (
             <div className="low-stock-products">
               <table>
                 <thead>
                   <tr>
-                    <th>Product</th>
+                    <th>Item</th>
                     <th>ID</th>
                     <th>Stock</th>
                     <th>Price</th>
@@ -217,7 +271,7 @@ function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.lowStockProducts.map(product => (
+                  {stats.lowStockItems.map(product => (
                     <tr key={product.product_id}>
                       <td className="product-cell">
                         <img 
@@ -230,7 +284,7 @@ function AdminDashboard() {
                       <td>#{product.product_id}</td>
                       <td className="stock-cell">
                         <span className={`stock-badge ${product.stock_quantity === 0 ? 'out-of-stock' : 'low-stock'}`}>
-                          {product.stock_quantity} left
+                          {product.stock_quantity === 0 ? 'Sold Out' : `${product.stock_quantity} left`}
                         </span>
                       </td>
                       <td>${parseFloat(product.price).toFixed(2)}</td>

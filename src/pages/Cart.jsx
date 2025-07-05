@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTrash, FaArrowLeft, FaShoppingBag } from 'react-icons/fa';
+import { FaTrash, FaArrowLeft, FaShoppingBag, FaClock, FaExclamationTriangle } from 'react-icons/fa';
 
 function Cart() {
   const { cart, updateQuantity, removeFromCart, loading } = useCart();
@@ -25,16 +25,26 @@ function Cart() {
   const handleCouponSubmit = (e) => {
     e.preventDefault();
     // Simulate coupon validation
-    if (couponCode.toUpperCase() === 'FITSHOP10') {
-      setCouponSuccess('Coupon applied successfully! 10% discount added.');
+    if (couponCode.toUpperCase() === 'STUDENT10') {
+      setCouponSuccess('Student discount applied! 10% off your order.');
       setCouponError('');
     } else {
-      setCouponError('Invalid coupon code. Please try again.');
+      setCouponError('Invalid coupon code. Try STUDENT10 for 10% off.');
       setCouponSuccess('');
     }
   };
 
   const handleCheckout = () => {
+    // Check if ordering is available
+    const now = new Date();
+    const cutoffTime = new Date();
+    cutoffTime.setHours(11, 30, 0, 0); // 11:30 AM
+    
+    if (now > cutoffTime) {
+      alert('Sorry, ordering is closed for today. Please order before 11:30 AM tomorrow.');
+      return;
+    }
+
     if (currentUser) {
       navigate('/checkout');
     } else {
@@ -43,11 +53,25 @@ function Cart() {
     }
   };
 
+  // Check if ordering is available
+  const isOrderingAvailable = () => {
+    const now = new Date();
+    const cutoffTime = new Date();
+    cutoffTime.setHours(11, 30, 0, 0); // 11:30 AM
+    return now < cutoffTime;
+  };
+
+  const getPickupTime = () => {
+    const now = new Date();
+    const pickupTime = new Date(now.getTime() + 30 * 60000); // Add 30 minutes
+    return pickupTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   if (loading) {
     return (
       <div className="loading-screen">
         <div className="spinner"></div>
-        <p>Loading your cart...</p>
+        <p>Loading your order...</p>
       </div>
     );
   }
@@ -60,10 +84,10 @@ function Cart() {
             <div className="empty-cart-icon">
               <FaShoppingBag />
             </div>
-            <h2>Your cart is empty</h2>
-            <p>Looks like you haven't added any products to your cart yet.</p>
-            <Link to="/" className="btn btn-primary">
-              Continue Shopping
+            <h2>Your order is empty</h2>
+            <p>Looks like you haven't added any items to your order yet.</p>
+            <Link to="/products" className="btn btn-primary">
+              Browse Menu
             </Link>
           </div>
         </div>
@@ -71,28 +95,51 @@ function Cart() {
     );
   }
 
-  // Calculate subtotal, shipping, and total
+  // Calculate subtotal, tax, and total
   const subtotal = cart.totalPrice;
   
-  // Free shipping over $100, otherwise $10
-  const shipping = subtotal > 100 ? 0 : 10;
+  // No delivery charges for canteen pickup
+  const tax = subtotal * 0.05; // 5% tax
   
   // Apply coupon discount if valid
   const discount = couponSuccess ? subtotal * 0.1 : 0;
   
-  const total = subtotal + shipping - discount;
+  const total = subtotal + tax - discount;
 
   return (
     <div className="cart-page">
       <div className="container">
-        <h1 className="page-title">Your Shopping Cart</h1>
+        <h1 className="page-title">Your Order</h1>
+        
+        {/* Ordering Status Banner */}
+        <div className={`ordering-banner ${isOrderingAvailable() ? 'available' : 'closed'}`} style={{
+          padding: '1rem',
+          marginBottom: '2rem',
+          borderRadius: '8px',
+          textAlign: 'center',
+          backgroundColor: isOrderingAvailable() ? '#d4edda' : '#f8d7da',
+          border: `1px solid ${isOrderingAvailable() ? '#c3e6cb' : '#f5c6cb'}`,
+          color: isOrderingAvailable() ? '#155724' : '#721c24'
+        }}>
+          <FaClock style={{marginRight: '8px'}} />
+          {isOrderingAvailable() ? (
+            <span>
+              <strong>Order Now!</strong> Pickup ready at {getPickupTime()} | Order deadline: 11:30 AM
+            </span>
+          ) : (
+            <span>
+              <FaExclamationTriangle style={{marginRight: '8px'}} />
+              <strong>Ordering Closed</strong> - Please order before 11:30 AM tomorrow
+            </span>
+          )}
+        </div>
         
         <div className="cart-content">
           <div className="cart-items">
             <table className="cart-table">
               <thead>
                 <tr>
-                  <th>Product</th>
+                  <th>Item</th>
                   <th>Price</th>
                   <th>Quantity</th>
                   <th>Subtotal</th>
@@ -165,7 +212,7 @@ function Cart() {
                 <div className="form-group">
                   <input
                     type="text"
-                    placeholder="Enter coupon code"
+                    placeholder="Enter coupon code (try STUDENT10)"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     className="form-control"
@@ -192,13 +239,13 @@ function Cart() {
               </div>
               
               <div className="summary-row">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span>Tax (5%)</span>
+                <span>${tax.toFixed(2)}</span>
               </div>
               
               {discount > 0 && (
                 <div className="summary-row discount">
-                  <span>Discount</span>
+                  <span>Student Discount</span>
                   <span>-${discount.toFixed(2)}</span>
                 </div>
               )}
@@ -211,13 +258,19 @@ function Cart() {
             
             <button 
               onClick={handleCheckout}
-              className="btn btn-lg btn-primary btn-block checkout-btn"
+              disabled={!isOrderingAvailable()}
+              className={`btn btn-lg btn-block checkout-btn ${!isOrderingAvailable() ? 'btn-disabled' : 'btn-primary'}`}
             >
-              Proceed to Checkout
+              {isOrderingAvailable() ? 'Place Order' : 'Ordering Closed'}
             </button>
             
-            <Link to="/" className="continue-shopping">
-              <FaArrowLeft /> Continue Shopping
+            <div style={{textAlign: 'center', marginTop: '1rem', fontSize: '0.875rem', color: '#6C757D'}}>
+              <FaClock style={{marginRight: '4px'}} />
+              Pickup from Canteen Counter in 30 minutes
+            </div>
+            
+            <Link to="/products" className="continue-shopping">
+              <FaArrowLeft /> Continue Browsing Menu
             </Link>
           </div>
         </div>

@@ -42,6 +42,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
 .main-nav .nav-item {
@@ -68,6 +69,27 @@
   width: 100%;
   height: 2px;
   background-color: var(--primary);
+}
+
+/* Ordering Status in Header */
+.ordering-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.status-available {
+  color: var(--success);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.status-closed {
+  color: var(--error);
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 .header-actions {
@@ -196,6 +218,42 @@
   background-color: var(--surface);
 }
 
+/* Product Card Enhancements for Canteen */
+.ordering-closed-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-1);
+}
+
+.btn-disabled {
+  background-color: var(--secondary-light);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.btn-disabled:hover {
+  background-color: var(--secondary-light);
+  color: var(--text-secondary);
+}
+
+.product-category {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+  font-style: italic;
+}
+
 /* Site Footer */
 .site-footer {
   background-color: var(--secondary-dark);
@@ -250,6 +308,9 @@
 
 .footer-links li {
   margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
 .footer-links a {
@@ -301,7 +362,7 @@
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.pexels.com/photos/4164761/pexels-photo-4164761.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
   background-size: cover;
   background-position: center;
   color: white;
@@ -326,6 +387,8 @@
 
 .hero-cta {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: var(--space-3);
   justify-content: center;
   animation-delay: 0.6s;
@@ -1020,7 +1083,7 @@
 
 .auth-info {
   display: none;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.pexels.com/photos/4498482/pexels-photo-4498482.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
   background-size: cover;
   background-position: center;
   color: white;

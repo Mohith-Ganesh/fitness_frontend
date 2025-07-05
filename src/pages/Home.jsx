@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import api from '../services/api';
 import { mockProducts } from '../services/mockData';
-import { FaDumbbell, FaRunning, FaHeartbeat, FaRegClock } from 'react-icons/fa';
+import { FaUtensils, FaClock, FaLeaf, FaHeart } from 'react-icons/fa';
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -21,7 +21,7 @@ function Home() {
         console.error('Error fetching products:', err);
         // Fallback to mock data if API fails
         setProducts(mockProducts);
-        setError('Could not fetch products from server. Showing sample products instead.');
+        setError('Could not fetch menu from server. Showing sample menu instead.');
         setLoading(false);
       }
     };
@@ -29,40 +29,59 @@ function Home() {
     fetchProducts();
   }, []);
 
-  // Featured products (first 4)
-  const featuredProducts = products.slice(0, 4);
+  // Today's specials (first 4 items)
+  const todaysSpecials = products.slice(0, 4);
   
-  // New arrivals (last 4)
-  const newArrivals = [...products].reverse().slice(0, 4);
-  
-  // Top deals (products with highest discount)
-  const topDeals = [...products]
+  // Popular items (items with discounts)
+  const popularItems = [...products]
     .filter(product => product.discounted_price)
-    .sort((a, b) => {
-      const discountA = a.price - a.discounted_price;
-      const discountB = b.price - b.discounted_price;
-      return discountB - discountA;
-    })
     .slice(0, 4);
+
+  // Check if ordering is available
+  const isOrderingAvailable = () => {
+    const now = new Date();
+    const cutoffTime = new Date();
+    cutoffTime.setHours(11, 30, 0, 0); // 11:30 AM
+    return now < cutoffTime;
+  };
+
+  const getPickupTime = () => {
+    const now = new Date();
+    const pickupTime = new Date(now.getTime() + 30 * 60000); // Add 30 minutes
+    return pickupTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <div className="home-page">
       {/* Hero Section */}
-      <section className="hero">
+      <section className="hero" style={{
+        background: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}>
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title slide-up">Elevate Your Fitness Journey</h1>
+            <h1 className="hero-title slide-up">Fresh Meals, Zero Wait</h1>
             <p className="hero-subtitle fade-in">
-              Premium equipment and accessories for every fitness level
+              Pre-order your lunch and pick it up in 30 minutes. Beat the lunch rush!
             </p>
-            <div className="hero-cta">
-              <Link to="/products" className="btn btn-lg btn-primary">
-                Shop Equipment
-              </Link>
-              <Link to="/products" className="btn btn-lg btn-outline">
-                Explore Accessories
-              </Link>
-            </div>
+            
+            {isOrderingAvailable() ? (
+              <div className="hero-cta">
+                <Link to="/products" className="btn btn-lg btn-primary">
+                  Order Now - Pickup at {getPickupTime()}
+                </Link>
+                <div style={{marginTop: '10px', color: 'white'}}>
+                  <FaClock /> Order deadline: 11:30 AM
+                </div>
+              </div>
+            ) : (
+              <div className="hero-cta">
+                <div className="btn btn-lg btn-secondary" style={{opacity: 0.7}}>
+                  Ordering Closed - Opens Tomorrow 8:00 AM
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -73,65 +92,65 @@ function Home() {
           <div className="features-grid">
             <div className="feature-item">
               <div className="feature-icon">
-                <FaDumbbell />
+                <FaClock />
               </div>
-              <h3 className="feature-title">Quality Equipment</h3>
+              <h3 className="feature-title">Quick Pickup</h3>
               <p className="feature-text">
-                Professional-grade fitness gear built to last
+                Order before 11:30 AM, pickup in 30 minutes
               </p>
             </div>
             
             <div className="feature-item">
               <div className="feature-icon">
-                <FaRegClock />
+                <FaUtensils />
               </div>
-              <h3 className="feature-title">Fast Delivery</h3>
+              <h3 className="feature-title">Fresh Daily</h3>
               <p className="feature-text">
-                Quick shipping to get you started right away
+                All meals prepared fresh every morning
               </p>
             </div>
             
             <div className="feature-item">
               <div className="feature-icon">
-                <FaRunning />
+                <FaLeaf />
               </div>
-              <h3 className="feature-title">Expert Advice</h3>
+              <h3 className="feature-title">Healthy Options</h3>
               <p className="feature-text">
-                Guidance from fitness professionals
+                Nutritious meals for busy students
               </p>
             </div>
             
             <div className="feature-item">
               <div className="feature-icon">
-                <FaHeartbeat />
+                <FaHeart />
               </div>
-              <h3 className="feature-title">Fitness Community</h3>
+              <h3 className="feature-title">Student Friendly</h3>
               <p className="feature-text">
-                Join like-minded fitness enthusiasts
+                Affordable prices for college budgets
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Products Section */}
+      {/* Today's Specials Section */}
       <section className="product-section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Featured Products</h2>
-            <Link to="/products" className="view-all">View All</Link>
+            <h2 className="section-title">Today's Specials</h2>
+            <Link to="/products" className="view-all">View Full Menu</Link>
           </div>
           
           {loading ? (
             <div className="loading-indicator">
               <div className="spinner"></div>
-              <p>Loading products...</p>
+              <p>Loading today's menu...</p>
             </div>
           ) : error ? (
             <div className="alert alert-info">{error}</div>
           ) : (
             <div className="product-grid">
-              {featuredProducts.map(product => (
+              {todaysSpecials.map(product => (
                 <ProductCard key={product.product_id} product={product} />
               ))}
             </div>
@@ -139,39 +158,46 @@ function Home() {
         </div>
       </section>
 
-      {/* New Arrivals Section */}
-      <section className="product-section bg-light">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">New Arrivals</h2>
-            <Link to="/products" className="view-all">View All</Link>
+      {/* Popular Items Section */}
+      {popularItems.length > 0 && (
+        <section className="product-section bg-light">
+          <div className="container">
+            <div className="section-header">
+              <h2 className="section-title">Student Favorites</h2>
+              <Link to="/products" className="view-all">View All</Link>
+            </div>
+            
+            <div className="product-grid">
+              {popularItems.map(product => (
+                <ProductCard key={product.product_id} product={product} />
+              ))}
+            </div>
           </div>
-          
-          <div className="product-grid">
-            {newArrivals.map(product => (
-              <ProductCard key={product.product_id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Newsletter Section */}
+      {/* Ordering Info Section */}
       <section className="newsletter-section">
         <div className="container">
           <div className="newsletter-content">
-            <h2 className="newsletter-title">Get Exclusive Offers</h2>
-            <p className="newsletter-text">
-              Subscribe to our newsletter and be the first to know about new products and special deals.
-            </p>
-            <form className="newsletter-form">
-              <input 
-                type="email" 
-                placeholder="Your Email Address" 
-                className="form-control"
-                required
-              />
-              <button type="submit" className="btn btn-accent">Subscribe</button>
-            </form>
+            <h2 className="newsletter-title">How It Works</h2>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginTop: '2rem'}}>
+              <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: '2rem', marginBottom: '1rem'}}>1️⃣</div>
+                <h3>Browse Menu</h3>
+                <p>Check out today's fresh offerings</p>
+              </div>
+              <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: '2rem', marginBottom: '1rem'}}>2️⃣</div>
+                <h3>Place Order</h3>
+                <p>Order before 11:30 AM deadline</p>
+              </div>
+              <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: '2rem', marginBottom: '1rem'}}>3️⃣</div>
+                <h3>Quick Pickup</h3>
+                <p>Collect your meal in 30 minutes</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

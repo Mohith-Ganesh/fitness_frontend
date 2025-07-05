@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
+import { FaFacebook, FaTwitter, FaInstagram, FaClock, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
 function Footer() {
   const currentYear = new Date().getFullYear();
@@ -9,10 +9,10 @@ function Footer() {
       <div className="container">
         <div className="footer-content">
           <div className="footer-section about">
-            <h3 className="footer-heading">FitShop</h3>
+            <h3 className="footer-heading">College Canteen</h3>
             <p className="footer-text">
-              Your one-stop destination for premium fitness equipment, 
-              accessories, and gear to support your fitness journey.
+              Fresh, delicious meals prepared daily for our college community. 
+              Pre-order your lunch and skip the queue!
             </p>
             <div className="social-links">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
@@ -24,9 +24,6 @@ function Footer() {
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
                 <FaInstagram />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-                <FaYoutube />
-              </a>
             </div>
           </div>
 
@@ -34,44 +31,45 @@ function Footer() {
             <h3 className="footer-heading">Quick Links</h3>
             <ul className="footer-links">
               <li><Link to="/">Home</Link></li>
-              <li><Link to="/products">Equipment</Link></li>
-              <li><Link to="/products">Wearables</Link></li>
-              <li><Link to="/products">Accessories</Link></li>
+              <li><Link to="/products">Today's Menu</Link></li>
+              <li><Link to="/orders">My Orders</Link></li>
               <li><Link to="/about">About Us</Link></li>
               <li><Link to="/contact">Contact</Link></li>
             </ul>
           </div>
 
-          <div className="footer-section customer-service">
-            <h3 className="footer-heading">Customer Service</h3>
+          <div className="footer-section hours">
+            <h3 className="footer-heading">Operating Hours</h3>
             <ul className="footer-links">
-              <li><Link to="/faq">FAQ</Link></li>
-              <li><Link to="/shipping">Shipping & Returns</Link></li>
-              <li><Link to="/warranty">Warranty</Link></li>
-              <li><Link to="/privacy">Privacy Policy</Link></li>
-              <li><Link to="/terms">Terms & Conditions</Link></li>
+              <li><FaClock /> Monday - Friday: 8:00 AM - 4:00 PM</li>
+              <li><FaClock /> Saturday: 9:00 AM - 2:00 PM</li>
+              <li><FaClock /> Sunday: Closed</li>
+              <li style={{marginTop: '10px', color: '#ff6b35'}}>
+                <strong>Order Deadline: 11:30 AM daily</strong>
+              </li>
             </ul>
           </div>
 
-          <div className="footer-section newsletter">
-            <h3 className="footer-heading">Stay Updated</h3>
-            <p className="footer-text">
-              Subscribe to our newsletter for the latest products, offers, and fitness tips.
+          <div className="footer-section contact">
+            <h3 className="footer-heading">Contact Info</h3>
+            <ul className="footer-links">
+              <li><FaMapMarkerAlt /> College Campus, Building A</li>
+              <li><FaPhone /> (555) 123-4567</li>
+              <li>canteen@college.edu</li>
+            </ul>
+            <p className="footer-text" style={{marginTop: '15px'}}>
+              Questions about your order? Contact us during operating hours.
             </p>
-            <form className="newsletter-form">
-              <input type="email" placeholder="Your Email" required />
-              <button type="submit" className="btn btn-accent">Subscribe</button>
-            </form>
           </div>
         </div>
 
         <div className="footer-bottom">
           <p className="copyright">
-            &copy; {currentYear} FitShop. All Rights Reserved.
+            &copy; {currentYear} College Canteen. All Rights Reserved.
           </p>
           <div className="payment-methods">
-            <span>Visa</span>
-            <span>MasterCard</span>
+            <span>Cash</span>
+            <span>Card</span>
             <span>PayPal</span>
           </div>
         </div>
